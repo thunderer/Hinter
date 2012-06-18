@@ -35,7 +35,7 @@ class ThunderHinter
         return $type;
         }
 
-    public function resolveArgumentTypes(array $arguments, $resolveObjectClassName = false)
+    /* public function resolveArgumentTypes(array $arguments, $resolveObjectClassName = false)
         {
         $ret = array();
         foreach($arguments as $argument)
@@ -43,15 +43,31 @@ class ThunderHinter
             $ret[] = $this->resolveVariableType($argument, $resolveObjectClassName);
             }
         return $ret;
-        }
+        } */
 
     public function isValidCall(array $args, array $callMetadata, $resolveObjectClassName = false)
         {
-        if(count($args) != count($callMetadata))
+        $callMetadataCount = count($callMetadata);
+        if(count($args) != $callMetadataCount)
             {
             return false;
             }
-        return !count(array_diff_assoc($callMetadata, $this->resolveArgumentTypes($args, $resolveObjectClassName)));
+        for($i = 0; $i < $callMetadataCount; $i++)
+            {
+            if(!$this->isValidArgument($args[$i], $callMetadata[$i], $resolveObjectClassName))
+                {
+                return false;
+                }
+            }
+        return true;
+        }
+
+    public function isValidArgument($argument, $expectedType, $resolveObjectClassName)
+        {
+        $argumentType = $this->resolveVariableType($argument, $resolveObjectClassName);
+        return
+            !(is_array($expectedType) && !in_array($argumentType, $expectedType)
+            || (!is_array($expectedType) && $expectedType != $argumentType));
         }
 
     public function matchCall($args)

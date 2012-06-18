@@ -68,40 +68,37 @@ class ThunderHinterTest extends \PHPUnit_Framework_TestCase
     public function matchCallDataProvider()
         {
         return array(
-            array(
-                'config' => array(
-                    'add' => array(
-                        'addOne' => array('integer'),
-                        'addTwo' => array('integer', 'integer'),
-                        ),
-                    ),
-                'calls' => array(
-                    array(array(2), 'addOne'),
-                    array(array(2, 56), 'addTwo'),
-                    array(array(2, new \stdClass()), 'exception'),
-                    array(array(4.45, false), 'exception')
-                    ),
-                ),
+            array(array(2), 'addOne'),
+            array(array(2, 56), 'addTwo'),
+            array(array(2, new \stdClass()), 'exception'),
+            array(array(4.45, false), 'exception'),
+            array(array(4, 4.45, 4), 'addThree'),
+            array(array(4, 5, 4), 'addThree'),
+            array(array(4, false, 4), 'exception'),
             );
         }
 
     /**
      * @dataProvider matchCallDataProvider
      */
-    public function testMatchCall(array $config, array $calls)
+    public function testMatchCall(array $args, $expected)
         {
+        $config = array(
+            'add' => array(
+                'addOne' => array('integer'),
+                'addTwo' => array('integer', 'integer'),
+                'addThree' => array('integer', array('integer', 'double'), 'integer'),
+                ),
+            );
         $instance = new ThunderHinter($config);
-        foreach($calls as $call)
+        if('exception' == $expected)
             {
-            if('exception' == $call[1])
-                {
-                $this->setExpectedException('\RuntimeException');
-                }
-            $result = $instance->matchCall($call[0]);
-            if('exception' != $call[1])
-                {
-                $this->assertEquals($call[1], $result);
-                }
+            $this->setExpectedException('\RuntimeException');
+            }
+        $result = $instance->matchCall($args);
+        if('exception' != $expected)
+            {
+            $this->assertEquals($expected, $result);
             }
         }
 
