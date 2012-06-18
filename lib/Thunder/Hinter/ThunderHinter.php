@@ -70,16 +70,23 @@ class ThunderHinter
             || (!is_array($expectedType) && $expectedType != $argumentType));
         }
 
-    public function matchCall($args)
+    public function getMethodCallsMetadata($method)
         {
-        foreach($this->calls as $call)
+        if(isset($this->calls[$method]))
             {
-            foreach($call as $targetMethod => $callMetadata)
+            return $this->calls[$method];
+            }
+        throw new \LogicException(sprintf('There is no call metadata for method: "%s".', $method));
+        }
+
+    public function matchCall($method, $args)
+        {
+        $call = $this->getMethodCallsMetadata($method);
+        foreach($call as $targetMethod => $callMetadata)
+            {
+            if($this->isValidCall($args, $callMetadata))
                 {
-                if($this->isValidCall($args, $callMetadata))
-                    {
-                    return $targetMethod;
-                    }
+                return $targetMethod;
                 }
             }
         throw new \RuntimeException('There is no valid call within current scope!');

@@ -59,6 +59,6 @@ class SampleClass
 
     public function __call($name, $args)
         {
-        return call_user_func_array(array($this, $this->hinter->matchCall($args)), $args);
+        return call_user_func_array(array($this, $this->hinter->matchCall($name, $args)), $args);
         }
     }

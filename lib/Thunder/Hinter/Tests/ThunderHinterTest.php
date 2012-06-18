@@ -95,7 +95,7 @@ class ThunderHinterTest extends \PHPUnit_Framework_TestCase
             {
             $this->setExpectedException('\RuntimeException');
             }
-        $result = $instance->matchCall($args);
+        $result = $instance->matchCall('add', $args);
         if('exception' != $expected)
             {
             $this->assertEquals($expected, $result);
