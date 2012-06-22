@@ -12,7 +12,7 @@ class ThunderHinter
     /**
      * @var array Overloaded class method calls metadata
      */
-    protected $calls;
+    protected $calls = array();
 
     /**
      * Constructor
@@ -21,7 +21,40 @@ class ThunderHinter
      */
     public function __construct(array $callsMetadata = array())
         {
-        $this->calls = $callsMetadata;
+        $this->configure($callsMetadata);
+        }
+
+    /*
+    $configuration = array(
+        'method' => array(
+            'target' => array('type', 'type', array('type1', 'type2'), 'type'),
+            ),
+        );
+    */
+
+    protected function configure(array $configuration)
+        {
+        foreach($configuration as $methodName => $methodData)
+            {
+            if(!is_array($methodData))
+                {
+                throw new \InvalidArgumentException(sprintf('Invalid method definition for %s.', $methodName));
+                }
+            $this->configureMethod($methodName, $methodData);
+            }
+        }
+
+    protected function configureMethod($name, array $calls)
+        {
+        $this->calls[$name] = array();
+        foreach($calls as $target => $call)
+            {
+            if(!is_array($call))
+                {
+                throw new \InvalidArgumentException(sprintf('Invalid target definition for %s.', $name));
+                }
+            $this->calls[$name][$target] = $call;
+            }
         }
 
     /**

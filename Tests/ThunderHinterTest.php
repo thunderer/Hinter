@@ -22,7 +22,7 @@ class ThunderHinterTest extends \PHPUnit_Framework_TestCase
 
     public function testValidInstanceClass()
         {
-        $this->assertInstanceOf('Thunder\Hinter\ThunderHinter', $this->instance);
+        $this->assertInstanceOf('Thunder\\Hinter\\ThunderHinter', $this->instance);
         }
 
     public function resolveVariableTypeDataProvider()
@@ -105,5 +105,39 @@ class ThunderHinterTest extends \PHPUnit_Framework_TestCase
     public function testGetCallsMetadata()
         {
         $this->assertEquals(array(), $this->instance->getCallsMetadata());
+        }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testExceptionOnInvalidMethodMetadata()
+        {
+        $config = array(
+            'add' => 'invalid',
+            );
+        $instance = new ThunderHinter($config);
+        }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testExceptionOnInvalidTargetMetadata()
+        {
+        $config = array(
+            'add' => array(
+                'target' => 'invalid',
+                ),
+            );
+        $instance = new ThunderHinter($config);
+        }
+
+    /**
+     * @expectedException LogicException
+     */
+    public function testExceptionOnGetNonExistentMethodMetadata()
+        {
+        $config = array();
+        $instance = new ThunderHinter($config);
+        $metadata = $instance->getMethodCallsMetadata('invalid');
         }
     }
