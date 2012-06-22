@@ -1,0 +1,25 @@
+{
+    "hash": "8e8fdf723a6b4f6e412dc9fcfbffc025",
+    "packages": [
+        {
+            "package": "symfony/yaml",
+            "version": "dev-master",
+            "alias-pretty-version": "2.1.x-dev",
+            "alias-version": "2.1.9999999.9999999-dev"
+        },
+        {
+            "package": "symfony/yaml",
+            "version": "dev-master",
+            "source-reference": "8272d98f8087878db37e8e5f6d4e37c5cc783dc3",
+            "commit-date": "1339592252"
+        }
+    ],
+    "packages-dev": null,
+    "aliases": [
+
+    ],
+    "minimum-stability": "dev",
+    "stability-flags": [
+
+    ]
+}

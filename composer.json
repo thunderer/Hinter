@@ -1,0 +1,25 @@
+{
+    "name": "thunder/hinter",
+    "type": "library",
+    "description": "ThunderHinter Library",
+    "keywords": [],
+    "homepage": "http://kowalczyk.cc",
+    "license": "MIT",
+    "authors": [
+        {
+            "name":"Tomasz Kowalczyk",
+            "email":"tomasz@kowalczyk.cc",
+            "homepage":"http://kowalczyk.cc"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0",
+        "symfony/yaml": "master"
+    },
+    "autoload": {
+        "psr-0": {
+            "Thunder\\Hinter": ""
+        }
+    },
+    "target-dir": "Thunder/Hinter"
+}
