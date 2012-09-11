@@ -32,13 +32,13 @@ class SampleClassTest extends \PHPUnit_Framework_TestCase
 
     public function testAddOne()
         {
-        $this->instance->addOne(4);
+        $this->instance->add(4);
         $this->assertEquals(4, $this->instance->getSum());
         }
 
     public function testAddTwo()
         {
-        $this->instance->addTwo(4, 5);
+        $this->instance->add(4, 5);
         $this->assertEquals(9, $this->instance->getSum());
         }
 
