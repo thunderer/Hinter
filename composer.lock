@@ -4,21 +4,21 @@
         {
             "package": "symfony/yaml",
             "version": "dev-master",
-            "alias-pretty-version": "2.1.x-dev",
-            "alias-version": "2.1.9999999.9999999-dev"
+            "alias-pretty-version": "2.2.x-dev",
+            "alias-version": "2.2.9999999.9999999-dev"
         },
         {
             "package": "symfony/yaml",
             "version": "dev-master",
-            "source-reference": "8272d98f8087878db37e8e5f6d4e37c5cc783dc3",
-            "commit-date": "1339592252"
+            "source-reference": "826fe43a6e3b330d79e711d2fc02540af8d10f61",
+            "commit-date": "1346957130"
         }
     ],
     "packages-dev": null,
     "aliases": [
 
     ],
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "stability-flags": [
 
     ]
