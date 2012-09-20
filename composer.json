@@ -14,7 +14,7 @@
     ],
     "require": {
         "php": ">=5.3.0",
-        "symfony/yaml": "master"
+        "symfony/yaml": "dev-master"
     },
     "autoload": {
         "psr-0": {
