@@ -1,6 +1,8 @@
 README
 =====
 
+[![Build Status](https://secure.travis-ci.org/thunderer/Hinter.png?branch=master)](http://travis-ci.org/thunderer/Hinter)
+
 What is ThunderHinter?
 ----------------------------
 
