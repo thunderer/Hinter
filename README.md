@@ -12,7 +12,6 @@ How to use it?
 If you want to apply your custom type hinting rules, you must initialize ThunderHinter object with a little bit of configuration. Let me show you an example that will probably answer all your questions:
 
 ```php
-<?php
 namespace Acme;
 
 use Thunder\Hinter\ThunderHinter;
