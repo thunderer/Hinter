@@ -1,6 +1,8 @@
 <?php
 namespace Thunder\Hinter;
 
+use Doctrine\Common\Annotations\AnnotationReader;
+
 /**
  * Main library class expected to be injected into target objects and use hooks
  * in their __call() method.

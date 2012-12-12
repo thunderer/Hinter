@@ -61,4 +61,8 @@ class SampleClass
         {
         return call_user_func_array(array($this, $this->hinter->matchCall($name, $args)), $args);
         }
+
+    public function sampleMethodOne(\PDO $connection, array $args, ThunderHinter $hinter)
+        {
+        }
     }
