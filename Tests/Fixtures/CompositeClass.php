@@ -3,7 +3,7 @@ namespace Thunder\Hinter\Tests\Fixtures;
 
 use Thunder\Hinter\ThunderHinter;
 
-class SampleClass
+class CompositeClass
     {
     protected $sum;
 

@@ -1,18 +1,18 @@
 <?php
 namespace Thunder\Hinter\Tests;
 
-use Thunder\Hinter\Tests\Fixtures\SampleClass;
+use Thunder\Hinter\Tests\Fixtures\InheritanceClass;
 
-class SampleClassTest extends \PHPUnit_Framework_TestCase
+class InheritanceClassTest extends \PHPUnit_Framework_TestCase
     {
     /**
-     * @var SampleClass
+     * @var InheritanceClass
      */
     protected $instance;
 
     public function setUp()
         {
-        $this->instance = new SampleClass();
+        $this->instance = new InheritanceClass();
         }
 
     public function tearDown()
@@ -22,12 +22,7 @@ class SampleClassTest extends \PHPUnit_Framework_TestCase
 
     public function testValidInstanceClass()
         {
-        $this->assertInstanceOf('Thunder\Hinter\Tests\Fixtures\SampleClass', $this->instance);
-        }
-
-    public function testGetHinter()
-        {
-        $this->assertInstanceOf('Thunder\Hinter\ThunderHinter', $this->instance->getHinter());
+        $this->assertInstanceOf('Thunder\Hinter\Tests\Fixtures\InheritanceClass', $this->instance);
         }
 
     public function testAddOne()
