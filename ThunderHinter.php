@@ -173,4 +173,15 @@ class ThunderHinter
             }
         throw new \RuntimeException('There is no valid call within current scope!');
         }
+
+    public function magicCall($name, $args, $self, ThunderHinter $hinter = null)
+        {
+        $hinter = $hinter ?: $self->getHinter();
+        return call_user_func_array(array($self, $hinter->matchCall($name, $args)), $args);
+        }
+
+    public function __call($name, $args)
+        {
+        return $this->magicCall($name, $args, $this, $this);
+        }
     }

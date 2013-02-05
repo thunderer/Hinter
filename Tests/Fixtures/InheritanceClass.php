@@ -45,10 +45,10 @@ class InheritanceClass extends ThunderHinter
         $this->sum += $one + $two;
         }
 
-    public function __call($name, $args)
-        {
-        return call_user_func_array(array($this, $this->matchCall($name, $args)), $args);
-        }
+//    public function __call($name, $args)
+//        {
+//        return parent::inheritanceCall($name, $args, $this);
+//        }
 
     public function sampleMethodOne(\PDO $connection, array $args, ThunderHinter $hinter)
         {
