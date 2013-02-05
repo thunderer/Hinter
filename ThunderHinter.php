@@ -174,12 +174,42 @@ class ThunderHinter
         throw new \RuntimeException('There is no valid call within current scope!');
         }
 
+    /**
+     * Ready to use magic call for custom implementation in composite mode. There
+     * are two ways of calling this - you can utilise commented __call() function
+     * below removing one of return statements. If you choose not to pass Hinter
+     * instance you must implement method getHinter() returning it - Hinter will
+     * then call that method implicitly getting itself from $self object
+     *
+     * @param string $name Target method name
+     * @param array $args Target method arguments
+     * @param Object $self Class to invoke methods on, simply pass $this
+     * @param ThunderHinter $hinter Optional Hinter instance
+     *
+     * @return mixed
+     */
     public function magicCall($name, $args, $self, ThunderHinter $hinter = null)
         {
         $hinter = $hinter ?: $self->getHinter();
         return call_user_func_array(array($self, $hinter->matchCall($name, $args)), $args);
         }
 
+    /* public function __call($name, $args)
+        {
+        return $this->hinter->magicCall($name, $args, $this, $this->hinter);
+        return $this->hinter->magicCall($name, $args, $this);
+        } */
+
+    /**
+     * If you use inheritance mode, the only thing to do is to specify calls
+     * configuration in your class, this magic method is inherited from Hinter
+     * instance automatically
+     *
+     * @param string $name Target method name
+     * @param array $args Target method arguments
+     *
+     * @return mixed
+     */
     public function __call($name, $args)
         {
         return $this->magicCall($name, $args, $this, $this);

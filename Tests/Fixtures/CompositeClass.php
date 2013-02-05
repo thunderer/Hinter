@@ -59,8 +59,8 @@ class CompositeClass
 
     public function __call($name, $args)
         {
-        // return $this->hinter->compositeCall($name, $args, $this, $this->hinter);
-        return $this->hinter->magicCall($name, $args, $this);
+        return $this->hinter->magicCall($name, $args, $this, $this->hinter);
+        // return $this->hinter->magicCall($name, $args, $this);
         }
 
     public function sampleMethodOne(\PDO $connection, array $args, ThunderHinter $hinter)
