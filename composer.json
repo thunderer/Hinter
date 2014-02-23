@@ -19,6 +19,5 @@
         "psr-4": {
             "Thunder\\Hinter\\": ""
         }
-    },
-    "target-dir": "Thunder/Hinter"
+    }
 }
