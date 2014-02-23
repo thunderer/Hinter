@@ -183,6 +183,7 @@ $config = array(
 
 * Method `given` accepting two parameters, first as string and second as an integer:
 
+```
 $config = array(
     'given' => array(
         'given' => array('string', 'integer'),
@@ -198,6 +199,7 @@ $config = array(
 
 * Method `other` accepting three parameters, first as numeric or string, second as a callable or string and third as a callable or Thunder\Hinter\Hinter instance:
 
+```
 $config = array(
     'other' => array(
         'other' => array('string', array('string', 'callable'), array('callable', 'Thunder\Hinter\Hinter'))
