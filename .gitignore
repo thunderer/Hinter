@@ -1,6 +1,5 @@
-.idea
-coverage
-coverage.xml
-phpunit.xml
-composer.phar
-vendor
+/coverage
+/coverage.xml
+/phpunit.xml
+/composer.phar
+/vendor
