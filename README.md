@@ -114,7 +114,7 @@ To implement explicit flow, just move necessary code outside a class and call as
 
 ```php
 $config = array(/* EXACTLY LIKE THAT ABOVE */);
-$this->hinter = new Hinter($config);
+$hinter = new Hinter($config);
 ```
 
 Now, when you execute something like:
@@ -128,7 +128,7 @@ $calc->minus(10); // minusOne()
 $calc->minus(1, 6.7); // minusTwo()
 
 $calc->multiply(4); // RuntimeException, method not configured
-$calc->minus(new \stdClass(), 4) // RuntimeException, failed to match call to configuration
+$calc->minus(new \stdClass(), 4) // RuntimeException, failed to match call
 ```
 
 or in the explicit flow:
@@ -142,7 +142,71 @@ $hinter->call($calc, 'minus', array(10)); // minusOne()
 $hinter->call($calc, 'minus', array(1, 6.7)); // minusTwo()
 
 $hinter->call($calc, 'multiply', array(4)); // RuntimeException, method not configured
-$hinter->call($calc, 'minus', array(new \stdClass(), 4)); // RuntimeException, failed to match call to configuration
+$hinter->call($calc, 'minus', array(new \stdClass(), 4)); // RuntimeException, failed to match call
 ```
 
 ThunderHinter will get the method you tried to call, it will try to match the types of passed variables to one of the signatures stored inside configuration and return the value of the target function. If you try to do an invalid call, you'll get a nice `\RuntimeException` telling you what failed.
+
+Configuration
+--------------
+
+This library supports all PHP types (these names are to be used in code):
+
+* integer, float, double, numeric,
+* string,
+* bool,
+* callable, Closure,
+* null,
+* object,
+* class name (with namespaces or not) - simply enter it without preceding backslash, eg. Thunder\Hinter\Hinter.
+
+If method accepts more than one argument, you need to supply as many array elements as required. If you want to accept multiple types on given argument, you need to pass array with those names in place of that argument. Configuration can be specified both in arrays and strings. If you use strings, separate type options with pipe `|` and arguments with comma `,`.
+
+Examples
+--------
+
+* Method `sample` accepting one string parameter:
+
+```
+$config = array(
+    'sample' => array(
+        'sample' => array('string'),
+        ),
+    );
+
+$config = array(
+    'sample' => array(
+        'sample' => 'string',
+        ),
+    );
+```
+
+* Method `given` accepting two parameters, first as string and second as an integer:
+
+$config = array(
+    'given' => array(
+        'given' => array('string', 'integer'),
+        ),
+    );
+
+$config = array(
+    'given' => array(
+        'given' => 'string,integer',
+        ),
+    );
+```
+
+* Method `other` accepting three parameters, first as numeric or string, second as a callable or string and third as a callable or Thunder\Hinter\Hinter instance:
+
+$config = array(
+    'other' => array(
+        'other' => array('string', array('string', 'callable'), array('callable', 'Thunder\Hinter\Hinter'))
+        ),
+    );
+
+$config = array(
+    'other' => array(
+        'other' => 'string,string|callable,callable|Thunder\\Hinter\\Hinter',
+        ),
+    );
+```
