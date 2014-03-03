@@ -167,7 +167,7 @@ Examples
 
 * Method `sample` accepting one string parameter:
 
-```
+```php
 $config = array(
     'sample' => array(
         'sample' => array('string'),
@@ -183,7 +183,7 @@ $config = array(
 
 * Method `given` accepting two parameters, first as string and second as an integer:
 
-```
+```php
 $config = array(
     'given' => array(
         'given' => array('string', 'integer'),
@@ -197,9 +197,9 @@ $config = array(
     );
 ```
 
-* Method `other` accepting three parameters, first as numeric or string, second as a callable or string and third as a callable or Thunder\Hinter\Hinter instance:
+* Method `other` accepting three parameters, first as string, second as a callable or string and third as a callable or Thunder\Hinter\Hinter instance:
 
-```
+```php
 $config = array(
     'other' => array(
         'other' => array('string', array('string', 'callable'), array('callable', 'Thunder\Hinter\Hinter'))

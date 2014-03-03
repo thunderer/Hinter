@@ -21,10 +21,10 @@ class Hinter
         {
         foreach($methods as $name => $calls)
             {
-            if(!is_array($calls))
+            if(!(is_array($calls) || is_string($calls)))
                 {
-                $message = 'Invalid %s method calls metadata.';
-                throw new \RuntimeException(sprintf($message, $name));
+                $message = 'Invalid %s method calls metadata: %s.';
+                throw new \RuntimeException(sprintf($message, $name, json_encode($calls)));
                 }
             $this->configureMethod($name, $calls);
             }
@@ -47,7 +47,8 @@ class Hinter
             {
             $message = 'Method %s was not configured. Available: %s.';
             $methods = implode(',', array_keys($this->methods));
-            throw new \RuntimeException(sprintf($message, $method, $methods));
+            $thrown = sprintf($message, $method, $methods);
+            throw new \RuntimeException($thrown);
             }
         $call = $this->methods[$method];
         foreach($call as $targetMethod => $callMetadata)
@@ -89,9 +90,13 @@ class Hinter
         return call_user_func_array(array($object, $target), $args);
         }
 
-    private function configureMethod($name, array $calls)
+    private function configureMethod($name, $calls)
         {
         $this->methods[$name] = array();
+        if(is_string($calls))
+            {
+            $calls = array($name => $calls);
+            }
         foreach($calls as $target => $call)
             {
             if(is_array($call))

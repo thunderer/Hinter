@@ -22,6 +22,7 @@ class Hinted
             'invalid' => array(
                 'invalidCall' => 'null',
                 ),
+            'setState' => 'integer',
             );
         $this->hinter = new Hinter($config);
         $this->state = 0;
@@ -36,6 +37,7 @@ class Hinted
     private function plusTwo($arg1, $arg2) { $this->state += ($arg1 + $arg2); }
     private function minusOne($arg) { $this->state -= $arg; }
     private function minusTwo($arg1, $arg2) { $this->state -= ($arg1 + $arg2); }
+    public function setState($int) { $this->state = $int; }
 
     public function __call($method, array $args)
         {
@@ -55,6 +57,7 @@ class HinterTest extends \PHPUnit_Framework_TestCase
             array('plus', array(0, 1.5), 1.5),
             array('minus', array(0), 1.5),
             array('minus', array(0, 0.5), 1),
+            array('setState', array(100), 100),
             );
 
         $this->assertEquals(0, $hinted->getState());
@@ -89,6 +92,7 @@ class HinterTest extends \PHPUnit_Framework_TestCase
                 'call' => array('callable'),
                 'callOption' => array(array('numeric'), array('integer', 'Closure')),
                 ),
+            'hinted' => 'integer,string',
             );
         $hinter = new Hinter($config);
         if(null !== $exception)
@@ -118,6 +122,8 @@ class HinterTest extends \PHPUnit_Framework_TestCase
             array('other', array(5.4, function() {}), 'callOption', null),
 
             array('invalid', array(), 'invalid', '\RuntimeException'),
+
+            array('hinted', array(4, 'str'), 'hinted', null),
             );
         }
 
