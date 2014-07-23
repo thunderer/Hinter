@@ -10,16 +10,28 @@ trait HinterTrait
 
     public function __set($property, $value)
         {
-        Hinter::SetProperty(get_class($this), $property, $value);
+        if(property_exists(get_class($this), $property))
+            {
+            $this->{$property} = $value;
+            }
+        else
+            {
+            Hinter::SetProperty($this, $property, $value);
+            }
         }
 
     public function __get($property)
         {
-        return Hinter::GetProperty(get_class($this), $property);
+        if(property_exists(get_class($this), $property))
+            {
+            return $this->{$property};
+            }
+        return Hinter::GetProperty($this, $property);
         }
 
     public function __call($method, array $args)
         {
+        var_dump($method);
         $class = get_class($this);
         if(!Hinter::HasClassMethod($class, $method))
             {

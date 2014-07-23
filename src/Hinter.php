@@ -92,46 +92,44 @@ class Hinter
         $managed = static::$config[$class]['properties'];
         foreach($managed as $name => $data)
             {
-            static::SetProperty($class, $name, $state[$name]);
+            static::SetProperty($object, $name, $state[$name]);
             }
         }
 
-    public static function SetProperty($class, $name, $value)
+    public static function SetProperty($object, $name, $value)
         {
-        static::$config[$class]['state'][$name] = $value;
+        static::$config[get_class($object)]['state'][$name] = $value;
         }
 
-    public static function GetProperty($class, $name)
+    public static function GetProperty($object, $name)
         {
-        return static::$config[$class]['state'][$name];
+        return static::$config[get_class($object)]['state'][$name];
         }
 
-    private static function IsValidCall($class, $variant, array $arguments)
+    private static function IsValidCall($class, $variant, array $args)
         {
         $metadata = static::$config[$class]['signatures'][$variant];
         $signature = $metadata['signature'];
         if(is_string($signature))
             {
-            if('void' == $signature && empty($arguments))
+            if('void' == $signature && empty($args))
                 {
                 return true;
                 }
             }
         else if(is_array($signature))
             {
-            $argumentsCount = count($arguments);
+            $argumentsCount = count($args);
             $expectedArgumentsCount = count($signature);
-            if($argumentsCount == $expectedArgumentsCount)
+            if($argumentsCount != $expectedArgumentsCount) { return false; }
+            for($i = 0; $i < $expectedArgumentsCount; $i++)
                 {
-                for($i = 0; $i < $expectedArgumentsCount; $i++)
+                if(!static::IsValidArgument($args[$i], $signature[$i]))
                     {
-                    if(!static::IsValidArgument($arguments[$i], $signature[$i]))
-                        {
-                        return false;
-                        }
+                    return false;
                     }
-                return true;
                 }
+            return true;
             }
         return false;
         }
@@ -141,10 +139,12 @@ class Hinter
         switch($expected)
             {
             case 'float': { return is_float($value); }
+            case 'numeric': { return is_numeric($value); }
+            case 'callable': { return is_callable($value); }
             }
         return is_array($expected)
             ? array_reduce($expected, function ($return, $item) use ($value) {
-                return $return ? : static::IsValidArgument($value, $item);
+                return $return ?: static::IsValidArgument($value, $item);
                 }, false)
             : static::GetArgumentType($value) === $expected;
         }
