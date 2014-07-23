@@ -1,0 +1,33 @@
+Thunder\Hinter\Tests\Fixture\Hinted:
+  state: []
+  properties:
+    state: float
+  methods:
+    __construct: [@setState]
+    add: [@addOne, @addTwo]
+    sub: [@subOne, @subTwo]
+    getState: [@getState]
+    setState: [@setState]
+    nativeMethod: nativeMethod
+  signatures:
+    @addOne:
+      signature: [float]
+      return: void
+    @addTwo:
+      signature: [float, float]
+      return: void
+    @subOne:
+      signature: [float]
+      return: void
+    @subTwo:
+      signature: [float, float]
+      return: void
+    @setState:
+      signature: [float]
+      return: void
+    @getState:
+      signature: void
+      return: float
+    nativeMethod:
+      signature: [string, integer, float]
+      return: null

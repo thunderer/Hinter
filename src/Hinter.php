@@ -1,174 +1,155 @@
 <?php
 namespace Thunder\Hinter;
 
-/**
- * ThunderHinter library main class
- *
- * @author Tomasz Kowalczyk <tomasz@kowalczyk.cc>
- */
 class Hinter
     {
-    private $methods = array();
+    private static $config = array();
 
-    /**
-     * Yep, it's a constructor.
-     *
-     * @param array $methods Methods calls definitions
-     *
-     * @throws \RuntimeException When method definition is invalid
-     */
-    public function __construct(array $methods)
+    public static function Init(array $config)
         {
-        foreach($methods as $name => $calls)
-            {
-            if(!(is_array($calls) || is_string($calls)))
-                {
-                $message = 'Invalid %s method calls metadata: %s.';
-                throw new \RuntimeException(sprintf($message, $name, json_encode($calls)));
-                }
-            $this->configureMethod($name, $calls);
-            }
+        static::$config = $config;
         }
 
-    /**
-     * Matches method call against given arguments array and returns target
-     * method name to call on your object
-     *
-     * @param string $method Overloaded method name
-     * @param array $args Arguments array
-     *
-     * @return mixed Target method return value
-     *
-     * @throws \RuntimeException When method or matching call was not found
-     */
-    public function match($method, array $args)
+    public static function HasClass($class)
         {
-        if(!array_key_exists($method, $this->methods))
+        return array_key_exists($class, static::$config);
+        }
+
+    public static function HasClassMethod($class, $method)
+        {
+        return static::HasClass($class) && array_key_exists($method, static::$config[$class]['methods']);
+        }
+
+    public static function GetMethodCallMatch($class, $method, array $arguments)
+        {
+        $variants = static::$config[$class]['methods'][$method];
+        foreach($variants as $variant)
             {
-            $message = 'Method %s was not configured. Available: %s.';
-            $methods = implode(',', array_keys($this->methods));
-            $thrown = sprintf($message, $method, $methods);
-            throw new \RuntimeException($thrown);
-            }
-        $call = $this->methods[$method];
-        foreach($call as $targetMethod => $callMetadata)
-            {
-            if($this->isValidCall($args, $callMetadata))
+            if(static::IsValidCall($class, $variant, $arguments))
                 {
-                return $targetMethod;
+                return $variant;
                 }
             }
 
-        $message = 'Failed to match call %s!';
-        $signature = $this->getSignature($this, $method, $args);
-        throw new \RuntimeException(sprintf($message, $signature));
+        return null;
         }
 
-    /**
-     * Shortcut method for implementations to use for example inside __call()
-     * method: finds target method using match(), calls it on passed object
-     * and returns its value
-     *
-     * @param object $object Instance to call methods on
-     * @param string $method Overloaded method name
-     * @param array $args Arguments array
-     *
-     * @return mixed Whatever target method returns
-     *
-     * @throws \RuntimeException If instance does not implement target method
-     */
-    public function call($object, $method, $args)
+    public static function GetArgumentsSignature($args)
         {
-        $target = $this->match($method, $args);
-        if(!method_exists($object, $target))
-            {
-            $message = 'Matched method %s but it does not exist!';
-            $signature = $this->getSignature($this, $target, $args);
-            throw new \RuntimeException(sprintf($message, $signature));
-            }
-
-        return call_user_func_array(array($object, $target), $args);
+        return implode(',', array_map(function($item) {
+            return static::GetArgumentType($item);
+            }, $args));
         }
 
-    private function configureMethod($name, $calls)
+    public static function ExtractState($object)
         {
-        $this->methods[$name] = array();
-        if(is_string($calls))
+        /**
+         * @var $property \ReflectionProperty
+         */
+        $reflectionObject = new \ReflectionObject($object);
+        $properties = $reflectionObject->getProperties();
+        $return = array();
+        foreach($properties as $property)
             {
-            $calls = array($name => $calls);
+            $property->setAccessible(true);
+            $return[$property->getName()] = $property->getValue($object);
             }
-        foreach($calls as $target => $call)
+
+        $managed = static::$config[get_class($object)]['properties'];
+        $state = static::$config[get_class($object)]['state'];
+        foreach($managed as $name => $data)
             {
-            if(is_array($call))
+            if(array_key_exists($name, $return))
                 {
-                $this->methods[$name][$target] = $call;
+                continue;
                 }
-            else if(is_string($call))
+            $return[$name] = array_key_exists($name, $state)
+                ? $state[$name]
+                : null;
+            }
+
+        return $return;
+        }
+
+    public static function WriteState($object, array $state)
+        {
+        /**
+         * @var $property \ReflectionProperty
+         */
+        $reflectionObject = new \ReflectionObject($object);
+        foreach($state as $key => $value)
+            {
+            if(!$reflectionObject->hasProperty($key))
                 {
-                $parts = explode(',', $call);
-                foreach($parts as $key => $part)
+                continue;
+                }
+            $property = $reflectionObject->getProperty($key);
+            $property->setAccessible(true);
+            $property->setValue($object, $value);
+            }
+
+        $class = get_class($object);
+        $managed = static::$config[$class]['properties'];
+        foreach($managed as $name => $data)
+            {
+            static::SetProperty($class, $name, $state[$name]);
+            }
+        }
+
+    public static function SetProperty($class, $name, $value)
+        {
+        static::$config[$class]['state'][$name] = $value;
+        }
+
+    public static function GetProperty($class, $name)
+        {
+        return static::$config[$class]['state'][$name];
+        }
+
+    private static function IsValidCall($class, $variant, array $arguments)
+        {
+        $metadata = static::$config[$class]['signatures'][$variant];
+        $signature = $metadata['signature'];
+        if(is_string($signature))
+            {
+            if('void' == $signature && empty($arguments))
+                {
+                return true;
+                }
+            }
+        else if(is_array($signature))
+            {
+            $argumentsCount = count($arguments);
+            $expectedArgumentsCount = count($signature);
+            if($argumentsCount == $expectedArgumentsCount)
+                {
+                for($i = 0; $i < $expectedArgumentsCount; $i++)
                     {
-                    $parts[$key] = (false !== strpos($part, '|'))
-                        ? explode('|', $part)
-                        : $part;
+                    if(!static::IsValidArgument($arguments[$i], $signature[$i]))
+                        {
+                        return false;
+                        }
                     }
-                $this->methods[$name][$target] = $parts;
-                }
-            else
-                {
-                $message = 'Invalid %s method call definition.';
-                throw new \RuntimeException(sprintf($message, $name));
+                return true;
                 }
             }
+        return false;
         }
 
-    private function isValidCall(array $args, array $callMetadata)
-        {
-        $expectedArgsCount = count($callMetadata);
-        $argsCount = count($args);
-        if($argsCount != $expectedArgsCount)
-            {
-            return false;
-            }
-        for($i = 0; $i < $expectedArgsCount; $i++)
-            {
-            if(!$this->isValidArgument($args[$i], $callMetadata[$i]))
-                {
-                return false;
-                }
-            }
-
-        return true;
-        }
-
-    private function isValidArgument($value, $expected)
+    private static function IsValidArgument($value, $expected)
         {
         switch($expected)
             {
-            // these types are not returned by gettype()
-            case 'numeric': { return is_numeric($value); }
-            case 'callable': { return is_callable($value); }
-            case 'object': { return is_object($value); }
             case 'float': { return is_float($value); }
             }
-
         return is_array($expected)
-            ? array_reduce($expected, function($return, $item) use($value) {
-                return $return ?: $this->isValidArgument($value, $item);
+            ? array_reduce($expected, function ($return, $item) use ($value) {
+                return $return ? : static::IsValidArgument($value, $item);
                 }, false)
-            : $this->getArgumentType($value) === $expected;
+            : static::GetArgumentType($value) === $expected;
         }
 
-    private function getSignature($object, $method, array $args)
-        {
-        $types = array_map(function($item) {
-            return $this->getArgumentType($item, true);
-            }, $args);
-
-        return get_class($object).'::'.$method.'('.implode(',', $types).')';
-        }
-
-    private function getArgumentType($variable)
+    private static function GetArgumentType($variable)
         {
         return is_object($variable)
             ? get_class($variable)
